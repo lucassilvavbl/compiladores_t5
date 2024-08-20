@@ -57,5 +57,3 @@ Ao utilizar a linha de comando ```mvn clean package``` deve bastar
 ### Extras
 
 Documentação adicional <a href="#">Em progresso</a>
-
-Executável para download <a href="https://github.com/Maracujacake/Compiladores_T4/blob/main/target/alguma-lexico-1.0-SNAPSHOT-jar-with-dependencies.jar">aqui</a>
