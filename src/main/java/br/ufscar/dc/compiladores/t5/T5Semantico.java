@@ -1,7 +1,7 @@
 package br.ufscar.dc.compiladores.t5;
 
 import static br.ufscar.dc.compiladores.t5.T5SemanticoUtils.verificarTipo;
-import static br.ufscar.dc.compiladores.t5.T5SemanticoUtils.adicionaErroSemantico;
+import static br.ufscar.dc.compiladores.t5.T5SemanticoUtils.addErroSemantico;
 import static br.ufscar.dc.compiladores.t5.T5SemanticoUtils.verificaCompatibilidade;
 import static br.ufscar.dc.compiladores.t5.T5SemanticoUtils.confereTipo;
 import br.ufscar.dc.compiladores.t5.TabelaDeSimbolos.TipoEntrada;
@@ -26,7 +26,7 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
     HashMap<String, ArrayList<String>> tabelaRegistro = new HashMap<>();
 
     // Método que adiciona o símbolo que está sendo analisado à tabela
-    public void adicionaSimboloTabela(String nome, String tipo, Token nomeT, Token tipoT, TipoEntrada tipoE) {
+    public void addSimboloTabela(String nome, String tipo, Token nomeT, Token tipoT, TipoEntrada tipoE) {
         // Escopo que está sendo atualmente manipulado
         TabelaDeSimbolos tabelaLocal = escoposAninhados.obterEscopoAtual();
 
@@ -62,14 +62,14 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
 
         // Caso o tipo seja inválido, exibe a mensagem de que o tipo não foi declarado
         if (tipoItem == TipoT5.INVALIDO)
-            adicionaErroSemantico(tipoT, "tipo " + tipo + " nao declarado");
+            addErroSemantico(tipoT, "tipo " + tipo + " nao declarado");
 
         // Verifica a existência do símbolo no escopo atual e exibe um erro caso já
         // tenha sido declarado
         if (!tabelaLocal.existe(nome))
             tabelaLocal.adicionar(nome, tipoItem, tipoE);
         else
-            adicionaErroSemantico(nomeT, "identificador " + nome + " ja declarado anteriormente");
+            addErroSemantico(nomeT, "identificador " + nome + " ja declarado anteriormente");
     }
 
     @Override
@@ -80,7 +80,7 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
         // principal para indicar o erro
         for (t5GramParser.CmdContext c : ctx.corpo().cmd())
             if (c.cmdRetorne() != null)
-                adicionaErroSemantico(c.getStart(), "comando retorne nao permitido nesse escopo");
+                addErroSemantico(c.getStart(), "comando retorne nao permitido nesse escopo");
 
         return super.visitPrograma(ctx);
     }
@@ -105,13 +105,13 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
             if (ctx.variavel().tipo().registro() != null) {
 
                 for (t5GramParser.IdentificadorContext ic : ctx.variavel().identificador()) {
-                    adicionaSimboloTabela(ic.getText(), "registro", ic.getStart(), null, TipoEntrada.VARIAVEL);
+                    addSimboloTabela(ic.getText(), "registro", ic.getStart(), null, TipoEntrada.VARIAVEL);
 
                     for (t5GramParser.VariavelContext vc : ctx.variavel().tipo().registro().variavel()) {
                         tipoVariavel = vc.tipo().getText();
 
                         for (t5GramParser.IdentificadorContext icr : vc.identificador())
-                            adicionaSimboloTabela(ic.getText() + "." + icr.getText(), tipoVariavel, icr.getStart(),
+                            addSimboloTabela(ic.getText() + "." + icr.getText(), tipoVariavel, icr.getStart(),
                                     vc.tipo().getStart(), TipoEntrada.VARIAVEL);
                     }
                 }
@@ -126,14 +126,14 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
                         nomeVariavel = ic.IDENT().get(0).getText();
 
                         if (tabela.existe(nomeVariavel) || tabelaRegistro.containsKey(nomeVariavel)) {
-                            adicionaErroSemantico(ic.getStart(),
+                            addErroSemantico(ic.getStart(),
                                     "identificador " + nomeVariavel + " ja declarado anteriormente");
                         } else {
-                            adicionaSimboloTabela(nomeVariavel, "registro", ic.getStart(),
+                            addSimboloTabela(nomeVariavel, "registro", ic.getStart(),
                                     ctx.variavel().tipo().getStart(), TipoEntrada.VARIAVEL);
 
                             for (int i = 0; i < variaveisRegistro.size(); i = i + 2) {
-                                adicionaSimboloTabela(nomeVariavel + "." + variaveisRegistro.get(i),
+                                addSimboloTabela(nomeVariavel + "." + variaveisRegistro.get(i),
                                         variaveisRegistro.get(i + 1), ic.getStart(), ctx.variavel().tipo().getStart(),
                                         TipoEntrada.VARIAVEL);
                             }
@@ -146,10 +146,10 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
 
                         // Verifica se a declaração atual é o nome de uma função ou procedimento
                         if (dadosFuncaoProcedimento.containsKey(nomeVariavel))
-                            adicionaErroSemantico(ident.getStart(),
+                            addErroSemantico(ident.getStart(),
                                     "identificador " + nomeVariavel + " ja declarado anteriormente");
                         else
-                            adicionaSimboloTabela(nomeVariavel, tipoVariavel, ident.getStart(),
+                            addSimboloTabela(nomeVariavel, tipoVariavel, ident.getStart(),
                                     ctx.variavel().tipo().getStart(), TipoEntrada.VARIAVEL);
                     }
                 }
@@ -172,7 +172,7 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
             }
             // Verifica se é a declaração de uma constante
         } else if (ctx.getText().contains("constante"))
-            adicionaSimboloTabela(ctx.IDENT().getText(), ctx.tipo_basico().getText(), ctx.IDENT().getSymbol(),
+            addSimboloTabela(ctx.IDENT().getText(), ctx.tipo_basico().getText(), ctx.IDENT().getSymbol(),
                     ctx.IDENT().getSymbol(), TipoEntrada.VARIAVEL);
 
         return super.visitDeclaracao_local(ctx);
@@ -199,7 +199,7 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
                 // Verifica se é um tipo básico válido
                 if (parametro.tipo_estendido().tipo_basico_ident().tipo_basico() != null) {
                     // Adiciona o parâmetro na tabela
-                    adicionaSimboloTabela(parametro.identificador().get(0).getText(),
+                    addSimboloTabela(parametro.identificador().get(0).getText(),
                             parametro.tipo_estendido().tipo_basico_ident().tipo_basico().getText(),
                             parametro.getStart(), parametro.getStart(), TipoEntrada.VARIAVEL);
 
@@ -225,16 +225,16 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
                         // Adiciona os elementos do registro na tabela no formato adequado com seus
                         // respectivos tipos individuais
                         for (int i = 0; i < variaveisRegistro.size(); i = i + 2)
-                            adicionaSimboloTabela(ic.getText() + "." + variaveisRegistro.get(i),
+                            addSimboloTabela(ic.getText() + "." + variaveisRegistro.get(i),
                                     variaveisRegistro.get(i + 1), ic.getStart(), ic.getStart(), TipoEntrada.VARIAVEL);
                 } else
-                    adicionaErroSemantico(parametro.getStart(), "tipo nao declarado");
+                    addErroSemantico(parametro.getStart(), "tipo nao declarado");
             }
             // Verifica se há algum comando "retorne" dentro de um procedimento e indica o
             // erro
             for (t5GramParser.CmdContext c : ctx.cmd())
                 if (c.cmdRetorne() != null)
-                    adicionaErroSemantico(c.getStart(), "comando retorne nao permitido nesse escopo");
+                    addErroSemantico(c.getStart(), "comando retorne nao permitido nesse escopo");
 
             // Adiciona o nome do procedimento e os tipos dos parâmetros na tabela de dados
             dadosFuncaoProcedimento.put(ctx.IDENT().getText(), tiposVariaveis);
@@ -247,7 +247,7 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
 
                 if (parametro.tipo_estendido().tipo_basico_ident().tipo_basico() != null) {
 
-                    adicionaSimboloTabela(parametro.identificador().get(0).getText(),
+                    addSimboloTabela(parametro.identificador().get(0).getText(),
                             parametro.tipo_estendido().tipo_basico_ident().tipo_basico().getText(),
                             parametro.getStart(), parametro.getStart(), TipoEntrada.VARIAVEL);
 
@@ -266,10 +266,10 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
 
                     for (t5GramParser.IdentificadorContext ic : parametro.identificador())
                         for (int i = 0; i < variaveisRegistro.size(); i = i + 2)
-                            adicionaSimboloTabela(ic.getText() + "." + variaveisRegistro.get(i),
+                            addSimboloTabela(ic.getText() + "." + variaveisRegistro.get(i),
                                     variaveisRegistro.get(i + 1), ic.getStart(), ic.getStart(), TipoEntrada.VARIAVEL);
                 } else
-                    adicionaErroSemantico(parametro.getStart(), "tipo nao declarado");
+                    addErroSemantico(parametro.getStart(), "tipo nao declarado");
             }
 
             // Adiciona o nome da função e os tipos dos parâmetros na tabela de dados
@@ -283,10 +283,10 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
 
         // Adiciona o nome do procedimento/função na tabela
         if (ctx.getText().contains("procedimento"))
-            adicionaSimboloTabela(ctx.IDENT().getText(), "void", ctx.getStart(), ctx.getStart(),
+            addSimboloTabela(ctx.IDENT().getText(), "void", ctx.getStart(), ctx.getStart(),
                     TipoEntrada.PROCEDIMENTO);
         else if (ctx.getText().contains("funcao"))
-            adicionaSimboloTabela(ctx.IDENT().getText(),
+            addSimboloTabela(ctx.IDENT().getText(),
                     ctx.tipo_estendido().tipo_basico_ident().tipo_basico().getText(), ctx.getStart(), ctx.getStart(),
                     TipoEntrada.FUNCAO);
 
@@ -300,7 +300,7 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
         for (t5GramParser.IdentificadorContext id : ctx.identificador())
             // Verifica se está lendo uma variável que ainda não foi declarada
             if (!tabela.existe(id.getText()))
-                adicionaErroSemantico(id.getStart(), "identificador " + id.getText() + " nao declarado");
+                addErroSemantico(id.getStart(), "identificador " + id.getText() + " nao declarado");
 
         return super.visitCmdLeia(ctx);
     }
@@ -346,7 +346,7 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
         if (tipoExpressao != TipoT5.INVALIDO) {
             // Caso a variável não tenha sido declarada, informa o erro
             if (!tabela.existe(varNome))
-                adicionaErroSemantico(ctx.identificador().getStart(),
+                addErroSemantico(ctx.identificador().getStart(),
                         "identificador " + ctx.identificador().getText() + " nao declarado");
             else {
                 TipoT5 varTipo = verificarTipo(tabela, varNome);
@@ -366,17 +366,17 @@ public class T5Semantico extends t5GramBaseVisitor<Void> {
                             // incompatíveis, pois
                             // seria a situação de estar comparando um número com um literal, por exemplo
                             if (tipoExpressao != TipoT5.INTEIRO)
-                                adicionaErroSemantico(ctx.identificador().getStart(),
+                                addErroSemantico(ctx.identificador().getStart(),
                                         "atribuicao nao compativel para ^" + ctx.identificador().getText());
                     } else if (!verificaCompatibilidade(varTipo, tipoExpressao))
                         if (tipoExpressao != TipoT5.INTEIRO)
-                            adicionaErroSemantico(ctx.identificador().getStart(),
+                            addErroSemantico(ctx.identificador().getStart(),
                                     "atribuicao nao compativel para " + ctx.identificador().getText());
                     // Caso a expressão analisada não tenha números que precisem ser tratados de
                     // maneira especial,
                     // apenas verifica se os tipos são diferentes
                 } else if (varTipo != tipoExpressao)
-                    adicionaErroSemantico(ctx.identificador().getStart(),
+                    addErroSemantico(ctx.identificador().getStart(),
                             "atribuicao nao compativel para " + ctx.identificador().getText());
             }
         }

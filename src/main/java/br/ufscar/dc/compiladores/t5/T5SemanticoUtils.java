@@ -14,7 +14,7 @@ public class T5SemanticoUtils {
     public static List<String> errosSemanticos = new ArrayList<>();
 
     // Método auxiliar utilizado para adicionar um novo erro identificado na lista
-    public static void adicionaErroSemantico(Token tok, String mensagem) {
+    public static void addErroSemantico(Token tok, String mensagem) {
         int linha = tok.getLine();
 
         // Verifica se o erro já foi identificado para poder adicioná-lo à lista
@@ -189,18 +189,18 @@ public class T5SemanticoUtils {
             }
             // Caso contrário, utiliza uma tabela auxiliar para prosseguir com a
             // verificação. Se a variável não
-            // tiver sido declarada, utiliza o método adicionaErroSemantico para verificar
+            // tiver sido declarada, utiliza o método addErroSemantico para verificar
             // se o erro já foi exibido e, caso ainda não tenha sido, o adiciona à lista
             else {
                 TabelaDeSimbolos tabelaAux = escoposAninhados.obterEscopoAtual();
 
                 if (!tabelaAux.existe(nome)) {
                     if (!ctx.identificador().getText().contains(nome)) {
-                        adicionaErroSemantico(ctx.identificador().getStart(),
+                        addErroSemantico(ctx.identificador().getStart(),
                                 "identificador " + ctx.identificador().getText() + " nao declarado");
                         tipoRetorno = TipoT5.INVALIDO;
                     } else {
-                        adicionaErroSemantico(ctx.identificador().getStart(),
+                        addErroSemantico(ctx.identificador().getStart(),
                                 "identificador " + ctx.identificador().getText() + " nao declarado");
                         tipoRetorno = TipoT5.INVALIDO;
                     }
@@ -214,13 +214,13 @@ public class T5SemanticoUtils {
                 if (aux.size() == ctx.expressao().size()) {
                     for (int i = 0; i < ctx.expressao().size(); i++)
                         if (aux.get(i) != verificarTipo(tabela, ctx.expressao().get(i)))
-                            adicionaErroSemantico(ctx.expressao().get(i).getStart(),
+                            addErroSemantico(ctx.expressao().get(i).getStart(),
                                     "incompatibilidade de parametros na chamada de " + ctx.IDENT().getText());
 
                     tipoRetorno = aux.get(aux.size() - 1);
 
                 } else
-                    adicionaErroSemantico(ctx.IDENT().getSymbol(),
+                    addErroSemantico(ctx.IDENT().getSymbol(),
                             "incompatibilidade de parametros na chamada de " + ctx.IDENT().getText());
             } else
                 tipoRetorno = TipoT5.INVALIDO;
@@ -244,7 +244,7 @@ public class T5SemanticoUtils {
             nome = ctx.identificador().getText();
 
             if (!tabela.existe(nome)) {
-                adicionaErroSemantico(ctx.identificador().getStart(),
+                addErroSemantico(ctx.identificador().getStart(),
                         "identificador " + ctx.identificador().getText() + " nao declarado");
                 tipoRetorno = TipoT5.INVALIDO;
             } else
