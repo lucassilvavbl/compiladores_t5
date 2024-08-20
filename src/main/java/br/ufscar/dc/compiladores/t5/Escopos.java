@@ -1,5 +1,3 @@
-// Classe Escopos, inspirada no código apresentado pelo
-// professor em sala de aula.
 package br.ufscar.dc.compiladores.t5;
 
 import java.util.LinkedList;
@@ -25,8 +23,8 @@ public final class Escopos {
     public List<TabelaDeSimbolos> percorrerEscoposAninhados() {
         return pilhaDeTabelas;
     }
-    
-    public void abandonarEscopo(){
+
+    public void abandonarEscopo() {
         pilhaDeTabelas.pop();
     }
 }

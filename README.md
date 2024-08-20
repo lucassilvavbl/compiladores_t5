@@ -43,7 +43,7 @@ Para isso, é necessário executar o corretor automático, passando para ele o a
 os casos de teste que deseja testar, um espaço onde, se quiser, pode fornecer uma string vazia ".", e o trabalho que deseja que seja corrigido, neste caso, o T3.
 
 ```
-java -jar "corretor/corretor.jar" "java -jar target/alguma-lexico-1.0-SNAPSHOT-jar-with-dependencies.jar" gcc "temp" "casos-de-teste" "760929, 798083" t4
+java -jar "corretor/corretor.jar" "java -jar target/alguma-lexico-1.0-SNAPSHOT-jar-with-dependencies.jar" gcc "temp" "casos-de-teste" "760929, 798083" t5
 ```
 
 3 - Para alterações

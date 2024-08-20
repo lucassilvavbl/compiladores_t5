@@ -1,5 +1,3 @@
-// Classe TabelaDeSimbolos, inspirada no código apresentado pelo
-// professor em sala de aula.
 package br.ufscar.dc.compiladores.t5;
 
 import java.util.HashMap;
@@ -9,12 +7,12 @@ import static br.ufscar.dc.compiladores.t5.T5SemanticoUtils.reduzNome;
 public class TabelaDeSimbolos {
 
     private final Map<String, EntradaTabelaDeSimbolos> tabela;
-    
+
     public TabelaDeSimbolos() {
         this.tabela = new HashMap<>();
     }
 
-    // Tipos possíveis de variáveis.
+    // Tipos possíveis de variáveis
     public enum TipoT5 {
         INTEIRO,
         REAL,
@@ -25,10 +23,10 @@ public class TabelaDeSimbolos {
         TIPOESTENDIDO,
         INVALIDO
     }
-    
-    // Tipos possíveis de declarações.
+
+    // Tipos possíveis de declarações
     public enum TipoEntrada {
-        VARIAVEL, // Para fins de simplificação, tudo que não for um procedimento ou função será considerado uma variável.
+        VARIAVEL, // Tudo que não for um procedimento ou função será considerado uma variável
         PROCEDIMENTO,
         FUNCAO
     }
@@ -46,21 +44,21 @@ public class TabelaDeSimbolos {
     }
 
     public TipoT5 verificar(String nome) {
-        // Remoção do índice de um vetor.
+        // Remoção do índice de um vetor
         nome = reduzNome(nome, "[");
-        
+
         return tabela.get(nome).tipo;
     }
 
     public void adicionar(String nome, TipoT5 tipo, TipoEntrada tipoE) {
-        // Remoção do índice de um vetor.
+        // Remoção do índice de um vetor
         nome = reduzNome(nome, "[");
-        
+
         tabela.put(nome, new EntradaTabelaDeSimbolos(nome, tipo, tipoE));
-    }    
+    }
 
     public boolean existe(String nome) {
-        // Remoção do índice de um vetor.
+        // Remoção do índice de um vetor
         nome = reduzNome(nome, "[");
 
         return tabela.containsKey(nome);
